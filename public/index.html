@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Dummy App</title>
+    <style>
+        .eachComment {
+            margin-top: 1rem;
+            padding: 1rem;
+            border: 2px solid black;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>My Dummy Weather App</h1>
+    <form id="getWeather">
+        <input type="text" id="cityInput" placeholder="Enter your city name" required>
+        <button type="submit">Get Weather</button>
+    </form>
+    <br>
+    <div id="result"></div>
+
+    <div class="comments">
+        <h2>Comments</h2>
+        <form id="postComment">
+            <input type="text" id="nameInput" placeholder="Enter your name" required>
+            <input type="text" id="commentInput" placeholder="Enter your comment" required>
+            <button type="submit">Post</button>
+        </form>
+        <br>
+        <div id="commentMsg"></div>
+        <div id="allComments">
+
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script type="module">
+        document.querySelector("#getWeather")
+            .addEventListener("submit", async (e) => {
+                e.preventDefault()
+                const cityInput = document.querySelector("#cityInput").value;
+                const result = document.querySelector("#result");
+                try {
+                    const axiosResp = await axios.get(`http://localhost:3001/weather/${cityInput}?unit=metric&side=west&age=23`)
+                    console.log(axiosResp.data)
+                    console.log("cityInput:", cityInput)
+                    result.innerHTML = `Current temperature is ${axiosResp.data.tempInC} C`
+                    const form = document.querySelectorAll("form").forEach((eachForm) => {
+                        eachForm.reset()
+                    })
+                }
+                catch (err) {
+                    console.log(err)
+                    result.innerHTML = err.response.data.msg;
+                }
+            })
+
+        document.querySelector("#postComment")
+            .addEventListener("submit", async (e) => {
+                e.preventDefault()
+                let nameInput = document.querySelector("#nameInput").value;
+                let commentInput = document.querySelector("#commentInput").value;
+                const commentMsg = document.querySelector("#commentMsg");
+
+                try {
+                    const axiosResp = await axios.post(`http://localhost:3001/comment/${nameInput}`, {
+                        comment: commentInput
+                    })
+                    console.log(axiosResp.data)
+                    document.querySelector("#allComments").innerHTML += `
+                        <div class="eachComment">
+                            <h3>${nameInput}</h3>
+                            <p>${commentInput}</p>
+                        </div>
+                    `
+                    commentMsg.innerHTML = axiosResp.data.msg
+                    const form = document.querySelectorAll("form").forEach((eachForm) => {
+                        eachForm.reset()
+                    })
+                }
+                catch (err) {
+                    console.log(err)
+                    commentMsg.innerHTML = err;
+                }
+
+            })
+
+        const getAllComments = async () => {
+            try {
+                const axiosResp = await axios.get(`http://localhost:3001/comments`)
+                console.log(axiosResp.data)
+                axiosResp.data.map(eachComment => {
+                    document.querySelector("#allComments").innerHTML += `
+                        <div class="eachComment">
+                            <h3>${eachComment.name}</h3>
+                            <p>${eachComment.comment}</p>
+                        </div>
+                    `
+                })
+            }
+            catch (err) {
+                console.log(err)
+            }
+        }
+        getAllComments()
+    </script>
+</body>
+
+</html>
