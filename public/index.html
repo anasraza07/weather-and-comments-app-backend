@@ -46,7 +46,7 @@
                 const cityInput = document.querySelector("#cityInput").value;
                 const result = document.querySelector("#result");
                 try {
-                    const axiosResp = await axios.get(`http://localhost:3001/weather/${cityInput}?unit=metric&side=west&age=23`)
+                    const axiosResp = await axios.get(`/weather/${cityInput}?unit=metric&side=west&age=23`)
                     console.log(axiosResp.data)
                     console.log("cityInput:", cityInput)
                     result.innerHTML = `Current temperature is ${axiosResp.data.tempInC} C`
@@ -55,7 +55,7 @@
                     })
                 }
                 catch (err) {
-                    console.log(err)
+                    console.log(err.response.data.msg)
                     result.innerHTML = err.response.data.msg;
                 }
             })
@@ -68,7 +68,7 @@
                 const commentMsg = document.querySelector("#commentMsg");
 
                 try {
-                    const axiosResp = await axios.post(`http://localhost:3001/comment/${nameInput}`, {
+                    const axiosResp = await axios.post(`/comment/${nameInput}`, {
                         comment: commentInput
                     })
                     console.log(axiosResp.data)
@@ -92,7 +92,7 @@
 
         const getAllComments = async () => {
             try {
-                const axiosResp = await axios.get(`http://localhost:3001/comments`)
+                const axiosResp = await axios.get(`/comments`)
                 console.log(axiosResp.data)
                 axiosResp.data.map(eachComment => {
                     document.querySelector("#allComments").innerHTML += `
